@@ -6,9 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
@@ -46,7 +44,7 @@ public class BookRepositoryImpl implements BookRepository {
             return entityManager.createQuery("SELECT b FROM Book b", Book.class)
                     .getResultList();
         } catch (Exception e) {
-        throw new DataProcessingException("Can't retrieve all books", e);
-    }
+            throw new DataProcessingException("Can't retrieve all books", e);
+        }
     }
 }
