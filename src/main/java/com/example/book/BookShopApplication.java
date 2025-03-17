@@ -16,20 +16,4 @@ public class BookShopApplication {
         SpringApplication.run(BookShopApplication.class, args);
     }
 
-    @Bean
-    public CommandLineRunner demoRunner(BookService bookService) {
-        return args -> {
-            Book book = new Book();
-            book.setTitle("Spring in Action");
-            book.setAuthor("Craig Walls");
-            book.setIsbn("1234567890");
-            book.setPrice(new BigDecimal("39.99"));
-            book.setDescription("Guide to Spring Boot");
-            book.setCoverImage("cover_image_url");
-            bookService.save(book);
-
-            List<Book> allBooks = bookService.findAll();
-            allBooks.forEach(b -> System.out.println("Book Title: " + b.getTitle()));
-        };
-    }
 }
