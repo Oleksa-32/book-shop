@@ -20,7 +20,7 @@ public class BookSpecificationBuilder implements SpecificationBuilder<Book> {
     @Override
     public Specification<Book> build(BookSearchParametersDto searchParametersDto) {
         Specification<Book> specification = Specification.where(null);
-        if (searchParametersDto.author() != null) {
+        if (searchParametersDto.author() != null && searchParametersDto.author().length > 0) {
             specification.and(specificationProviderManager.getSpecificationProvider(AUTHOR_KEY)
                     .getSpecification(searchParametersDto.author()));
         }

@@ -9,7 +9,6 @@ import com.example.book.repository.BookRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -65,6 +64,6 @@ public class BookServiceImpl implements BookService {
         Specification<Book> bookSpecification = specificationBuilder.build(searchParametersDto);
         return bookRepository.findAll(bookSpecification).stream()
                 .map(bookMapper::toDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
