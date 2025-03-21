@@ -1,8 +1,10 @@
 package com.example.book.controller;
 
 import com.example.book.dto.BookDto;
+import com.example.book.dto.BookSearchParametersDto;
 import com.example.book.dto.CreateBookRequestDto;
 import com.example.book.service.BookService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,7 +36,7 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BookDto save(@RequestBody CreateBookRequestDto requestDto) {
+    public BookDto save(@RequestBody @Valid CreateBookRequestDto requestDto) {
         return bookService.save(requestDto);
     }
 
@@ -47,5 +49,10 @@ public class BookController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);
+    }
+
+    @GetMapping("/search")
+    public List<BookDto> searchBooks(BookSearchParametersDto searchParametersDto) {
+        return bookService.search(searchParametersDto);
     }
 }
