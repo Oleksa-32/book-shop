@@ -41,7 +41,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}")
-    public BookDto updateBook(@PathVariable Long id, @RequestBody BookDto updateRequest) {
+    public BookDto updateBook(@PathVariable Long id, @RequestBody @Valid BookDto updateRequest) {
         return bookService.updateBook(id, updateRequest);
     }
 
@@ -52,7 +52,7 @@ public class BookController {
     }
 
     @GetMapping("/search")
-    public List<BookDto> searchBooks(@Valid BookSearchParametersDto searchParametersDto) {
+    public List<BookDto> searchBooks(BookSearchParametersDto searchParametersDto) {
         return bookService.search(searchParametersDto);
     }
 }
