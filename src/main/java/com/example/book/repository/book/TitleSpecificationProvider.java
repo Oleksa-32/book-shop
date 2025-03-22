@@ -8,9 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TitleSpecificationProvider implements SpecificationProvider {
+    private static final String TITLE_KEY = "title";
+
     @Override
     public String getKey() {
-        return "title";
+        return TITLE_KEY;
     }
 
     @Override
