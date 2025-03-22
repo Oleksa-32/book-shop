@@ -18,6 +18,6 @@ public class IsbnSpecificationProvider implements SpecificationProvider<Book> {
     @Override
     public Specification<Book> getSpecification(String[] param) {
         return (root, query, cb) ->
-                root.get("isbn").in(Arrays.stream(param).toArray());
+                root.get(ISBN_KEY).in(Arrays.stream(param).toArray());
     }
 }
