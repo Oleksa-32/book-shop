@@ -1,5 +1,6 @@
 package com.example.book.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,9 +35,9 @@ public class CustomGlobalExceptionHandler {
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<String> handleNullPointerExceptions(NullPointerException ex) {
-        return new ResponseEntity<>("Null pointer exception occurred",
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<String> handleEntityNotFoundException(EntityNotFoundException ex) {
+        return new ResponseEntity<>("Entity not found exception occurred",
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
