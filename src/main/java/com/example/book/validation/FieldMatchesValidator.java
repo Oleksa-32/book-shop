@@ -2,35 +2,23 @@ package com.example.book.validation;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import java.lang.reflect.Field;
 import java.util.Objects;
+import org.springframework.beans.BeanWrapperImpl;
 
 public class FieldMatchesValidator implements ConstraintValidator<FieldMatches, Object> {
-    private String[] fieldNames;
+    private String field;
+    private String fieldMatch;
 
     @Override
     public void initialize(FieldMatches constraintAnnotation) {
-        this.fieldNames = constraintAnnotation.fields();
+        this.field = constraintAnnotation.field();
+        this.fieldMatch = constraintAnnotation.fieldMatch();
     }
 
     @Override
-    public boolean isValid(Object obj, ConstraintValidatorContext context) {
-        try {
-            Field firstField = obj.getClass().getDeclaredField(fieldNames[0]);
-            firstField.setAccessible(true);
-            Object firstValue = firstField.get(obj);
-
-            for (int i = 1; i < fieldNames.length; i++) {
-                Field currentField = obj.getClass().getDeclaredField(fieldNames[i]);
-                currentField.setAccessible(true);
-
-                if (!Objects.equals(firstValue, currentField.get(obj))) {
-                    return false;
-                }
-            }
-            return true;
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            return false;
-        }
+    public boolean isValid(Object value, ConstraintValidatorContext context) {
+        Object field = new BeanWrapperImpl(value).getPropertyValue(this.field);
+        Object fieldMatch = new BeanWrapperImpl(value).getPropertyValue(this.fieldMatch);
+        return Objects.equals(field, fieldMatch);
     }
 }
