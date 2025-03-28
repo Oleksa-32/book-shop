@@ -4,6 +4,8 @@ import com.example.book.dto.user.UserRegistrationRequestDto;
 import com.example.book.dto.user.UserResponseDto;
 import com.example.book.exception.RegistrationException;
 import com.example.book.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
