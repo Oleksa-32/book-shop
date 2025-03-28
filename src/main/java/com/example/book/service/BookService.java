@@ -3,18 +3,20 @@ package com.example.book.service;
 import com.example.book.dto.BookDto;
 import com.example.book.dto.BookSearchParametersDto;
 import com.example.book.dto.CreateBookRequestDto;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface BookService {
     BookDto save(CreateBookRequestDto requestDto);
 
     BookDto getBookById(Long id);
 
-    List<BookDto> findAll();
+    Page<BookDto> findAll(Pageable pageable);
 
     BookDto updateBook(Long id, BookDto updateRequest);
 
     void deleteBook(Long id);
 
-    List<BookDto> search(BookSearchParametersDto searchParametersDto);
+    Page<BookDto> search(BookSearchParametersDto searchParametersDto,
+                         Pageable pageable);
 }
