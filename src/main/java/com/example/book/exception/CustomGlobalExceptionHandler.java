@@ -40,4 +40,10 @@ public class CustomGlobalExceptionHandler {
         return new ResponseEntity<>("Entity not found exception occurred",
                 HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler
+    public ResponseEntity<String> handlerRegistrationException(RegistrationException ex) {
+        return new ResponseEntity<>(ex.getMessage(),
+                HttpStatus.CONFLICT);
+    }
 }
