@@ -4,9 +4,14 @@ import com.example.book.dto.user.UserRegistrationRequestDto;
 import com.example.book.dto.user.UserResponseDto;
 import com.example.book.exception.RegistrationException;
 import com.example.book.mapper.UserMapper;
+import com.example.book.model.Role;
 import com.example.book.model.User;
+import com.example.book.repository.RoleRepository;
 import com.example.book.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,6 +19,8 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -24,7 +31,12 @@ public class UserServiceImpl implements UserService {
             );
         }
         User user = userMapper.toModel(requestDto);
-        user.setPassword(requestDto.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        Role role = roleRepository.findByName(Role.Roles.ROLE_USER)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Role is not found: " + Role.Roles.ROLE_USER)
+                );
+        user.setRoles(Set.of(role));
         return userMapper.toDto(userRepository.save(user));
     }
 }
