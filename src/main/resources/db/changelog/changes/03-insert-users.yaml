@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: 03-insert-users
+      author: oleksa
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: 1
+              - column:
+                  name: email
+                  value: "jane.doe@example.com"
+              - column:
+                  name: password
+                  value: "z3e2a$Yu&Y*H[$$*sO{y"
+              - column:
+                  name: first_name
+                  value: "Jane"
+              - column:
+                  name: last_name
+                  value: "Doe"
+              - column:
+                  name: shipping_address
+                  value: "123 Maple Street, Springfield, IL 62704"
+
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  value: 2
+              - column:
+                  name: email
+                  value: "john.smith@example.com"
+              - column:
+                  name: password
+                  value: "&K^eL@v?g6$VrtUJes:^"
+              - column:
+                  name: first_name
+                  value: "John"
+              - column:
+                  name: last_name
+                  value: "Smith"
+              - column:
+                  name: shipping_address
+                  value: "456 Oak Avenue, Shelbyville, IL 62565"
