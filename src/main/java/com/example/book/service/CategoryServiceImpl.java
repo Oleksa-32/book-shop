@@ -1,6 +1,7 @@
 package com.example.book.service;
 
-import com.example.book.dto.CategoryDto;
+import com.example.book.dto.category.CategoryDto;
+import com.example.book.dto.category.UpdateCategoryRequestDto;
 import com.example.book.mapper.CategoryMapper;
 import com.example.book.model.Category;
 import com.example.book.repository.CategoryRepository;
@@ -37,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDto update(Long id, CategoryDto categoryDto) {
+    public CategoryDto update(Long id, UpdateCategoryRequestDto updateCategoryRequestDto) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Category with id " + id + " not found"));

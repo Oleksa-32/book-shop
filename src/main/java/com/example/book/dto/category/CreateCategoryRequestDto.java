@@ -1,4 +1,4 @@
-package com.example.book.dto;
+package com.example.book.dto.category;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

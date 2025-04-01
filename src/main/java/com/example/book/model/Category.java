@@ -1,8 +1,10 @@
 package com.example.book.model;
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 @Entity
+@Setter
 @Table(name = "categories")
 public class Category {
     @Id

@@ -1,6 +1,7 @@
 package com.example.book.service;
 
-import com.example.book.dto.CategoryDto;
+import com.example.book.dto.category.CategoryDto;
+import com.example.book.dto.category.UpdateCategoryRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -8,6 +9,6 @@ public interface CategoryService {
     Page<CategoryDto> findAll(Pageable pageable);
     CategoryDto getById(Long id);
     CategoryDto save(CategoryDto categoryDto);
-    CategoryDto update(Long id, CategoryDto categoryDto);
+    CategoryDto update(Long id, UpdateCategoryRequestDto updateCategoryRequestDto);
     void deleteById(Long id);
 }

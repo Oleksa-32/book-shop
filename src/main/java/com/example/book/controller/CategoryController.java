@@ -1,7 +1,8 @@
 package com.example.book.controller;
 
 
-import com.example.book.dto.CategoryDto;
+import com.example.book.dto.category.CategoryDto;
+import com.example.book.dto.category.UpdateCategoryRequestDto;
 import com.example.book.repository.BookRepository;
 import com.example.book.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,8 +49,10 @@ public class CategoryController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update category", description = "Updates details of an existing category")
-    public CategoryDto updateCategory(@PathVariable Long id, @Valid @RequestBody CategoryDto categoryDto) {
-        return categoryService.update(id, categoryDto);
+    public CategoryDto updateCategory(@PathVariable Long id,
+                                      @Valid
+                                      @RequestBody UpdateCategoryRequestDto updateCategoryRequestDto) {
+        return categoryService.update(id, updateCategoryRequestDto);
     }
 
     @DeleteMapping("/{id}")
@@ -60,10 +63,4 @@ public class CategoryController {
         categoryService.deleteById(id);
     }
 
-//    @GetMapping("/{id}/books")
-//    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-//    @Operation(summary = "Get books by category", description = "Retrieves books that belong to a specific category")
-//    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(@PathVariable Long id, Pageable pageable) {
-//        return bookService.getBooksByCategoryId(id, pageable);
-//    }
 }
