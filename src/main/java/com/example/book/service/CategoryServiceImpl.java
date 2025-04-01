@@ -1,6 +1,7 @@
 package com.example.book.service;
 
 import com.example.book.dto.category.CategoryDto;
+import com.example.book.dto.category.CreateCategoryRequestDto;
 import com.example.book.dto.category.UpdateCategoryRequestDto;
 import com.example.book.mapper.CategoryMapper;
 import com.example.book.model.Category;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
-public class CategoryServiceImpl implements CategoryService{
+public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
 
@@ -32,8 +33,8 @@ public class CategoryServiceImpl implements CategoryService{
     }
 
     @Override
-    public CategoryDto save(CategoryDto categoryDto) {
-        Category category = categoryMapper.toModel(categoryDto);
+    public CategoryDto save(CreateCategoryRequestDto createCategoryRequestDto) {
+        Category category = categoryMapper.toModel(createCategoryRequestDto);
         return categoryMapper.toDto(categoryRepository.save(category));
     }
 

@@ -1,6 +1,6 @@
 package com.example.book.repository.book;
 
-import com.example.book.dto.BookSearchParametersDto;
+import com.example.book.dto.book.BookSearchParametersDto;
 import com.example.book.model.Book;
 import com.example.book.repository.SpecificationBuilder;
 import com.example.book.repository.SpecificationProviderManager;

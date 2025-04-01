@@ -7,7 +7,8 @@ import lombok.Data;
 @Data
 public class CreateCategoryRequestDto {
     @NotBlank
-    @Size(max = 100, message = "Name length must be less then 100 characters")
+    @Size(min = 2, max = 100, message = "Name length must be at lest 4 characters"
+            + " and not longer then 100 characters")
     private String name;
     private String description;
 }

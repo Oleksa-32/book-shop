@@ -1,13 +1,16 @@
 package com.example.book.service;
 
-import com.example.book.dto.BookDto;
-import com.example.book.dto.BookSearchParametersDto;
-import com.example.book.dto.CreateBookRequestDto;
+import com.example.book.dto.book.BookDto;
+import com.example.book.dto.book.BookDtoWithoutCategoryIds;
+import com.example.book.dto.book.BookSearchParametersDto;
+import com.example.book.dto.book.CreateBookRequestDto;
 import com.example.book.mapper.BookMapper;
 import com.example.book.model.Book;
 import com.example.book.repository.BookRepository;
+import com.example.book.repository.CategoryRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
 import jakarta.persistence.EntityNotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,6 +23,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder specificationBuilder;
+    private CategoryRepository categoryRepository;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
@@ -48,6 +52,18 @@ public class BookServiceImpl implements BookService {
                         new EntityNotFoundException("Book with id " + id + " not found"));
         bookMapper.updateBookFromDto(updateRequest, existingBook);
         return bookMapper.toDto(bookRepository.save(existingBook));
+    }
+
+    @Override
+    public List<BookDtoWithoutCategoryIds> findByCategoryId(Long id, Pageable pageable) {
+        if (!categoryRepository.existsById(id)) {
+            throw new EntityNotFoundException("Category with id " + id + " not found");
+        }
+        return bookRepository
+                .findByCategoryId(id, pageable)
+                .stream()
+                .map(bookMapper::toDtoWithoutCategories)
+                .toList();
     }
 
     @Override
