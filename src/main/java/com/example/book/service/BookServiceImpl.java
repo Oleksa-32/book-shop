@@ -10,7 +10,6 @@ import com.example.book.repository.BookRepository;
 import com.example.book.repository.CategoryRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
 import jakarta.persistence.EntityNotFoundException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -55,15 +54,13 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDtoWithoutCategoryIds> findByCategoryId(Long id, Pageable pageable) {
+    public Page<BookDtoWithoutCategoryIds> findByCategoryId(Long id, Pageable pageable) {
         if (!categoryRepository.existsById(id)) {
             throw new EntityNotFoundException("Category with id " + id + " not found");
         }
         return bookRepository
                 .findByCategoryId(id, pageable)
-                .stream()
-                .map(bookMapper::toDtoWithoutCategories)
-                .toList();
+                .map(bookMapper::toDtoWithoutCategories);
     }
 
     @Override

@@ -9,7 +9,6 @@ import com.example.book.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -80,7 +79,7 @@ public class CategoryController {
     @GetMapping("/{id}/books")
     @Operation(summary = "Get books by category id",
             description = "Get all books which belong for category by given category id")
-    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(
+    public Page<BookDtoWithoutCategoryIds> getBooksByCategoryId(
             @PathVariable Long id, @ParameterObject Pageable pageable) {
         return bookService.findByCategoryId(id, pageable);
     }
