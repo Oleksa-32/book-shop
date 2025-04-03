@@ -26,11 +26,11 @@ public interface CategoryMapper {
                        @MappingTarget Category category);
 
     @Named("categoriesByIds")
-    default Set<Category> mapCategoriesIdsToCategories(Set<Long> categoriesIds) {
-        if (categoriesIds == null || categoriesIds.isEmpty()) {
+    default Set<Category> mapCategoriesIdsToCategories(Set<Long> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
             return new HashSet<>();
         }
-        return categoriesIds.stream()
+        return categoryIds.stream()
                 .map(id -> {
                     Category category = new Category();
                     category.setId(id);
