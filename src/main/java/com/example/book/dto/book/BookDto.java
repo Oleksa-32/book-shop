@@ -1,6 +1,7 @@
-package com.example.book.dto;
+package com.example.book.dto.book;
 
 import java.math.BigDecimal;
+import java.util.Set;
 import lombok.Data;
 
 @Data
@@ -12,4 +13,5 @@ public class BookDto {
     private BigDecimal price;
     private String description;
     private String coverImage;
+    private Set<Long> categoryIds;
 }

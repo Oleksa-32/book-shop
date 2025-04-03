@@ -1,8 +1,9 @@
 package com.example.book.mapper;
 
 import com.example.book.config.MapperConfig;
-import com.example.book.dto.BookDto;
-import com.example.book.dto.CreateBookRequestDto;
+import com.example.book.dto.book.BookDto;
+import com.example.book.dto.book.BookDtoWithoutCategoryIds;
+import com.example.book.dto.book.CreateBookRequestDto;
 import com.example.book.model.Book;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,4 +21,6 @@ public interface BookMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     void updateBookFromDto(BookDto bookDto, @MappingTarget Book book);
+
+    BookDtoWithoutCategoryIds toDtoWithoutCategories(Book book);
 }
