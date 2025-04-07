@@ -27,7 +27,6 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("status <> 'DELETED'")
 public class ShoppingCart {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @MapsId
     @OneToOne(fetch = FetchType.LAZY)

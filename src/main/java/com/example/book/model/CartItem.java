@@ -29,6 +29,4 @@ public class CartItem {
     private Book book;
     @Column(nullable = false)
     private int quantity;
-
-
 }

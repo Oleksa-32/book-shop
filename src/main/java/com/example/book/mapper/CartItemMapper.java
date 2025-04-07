@@ -25,6 +25,9 @@ public interface CartItemMapper {
     @Mapping(target = "book", source = "bookId", qualifiedByName = "bookFromId")
     CartItem dtoToModel(CartItemDto cartItemDto);
 
+    @Mapping(target = "book", source = "bookId", qualifiedByName = "bookFromId")
+    CartItem toModel(CreateCartItemDto cartItemDto);
+
     @Mapping(target = "id", ignore = true)
     void updateFromDto(UpdateCartItemDto updateCartItemDto, @MappingTarget CartItem cartItem);
 

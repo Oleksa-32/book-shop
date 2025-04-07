@@ -8,6 +8,7 @@ import com.example.book.model.Role;
 import com.example.book.model.User;
 import com.example.book.repository.RoleRepository;
 import com.example.book.repository.UserRepository;
+import com.example.book.service.shoppingcart.ShoppingCartService;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ShoppingCartService shoppingCartService;
 
     @Override
     public UserResponseDto register(UserRegistrationRequestDto requestDto)
@@ -39,6 +41,10 @@ public class UserServiceImpl implements UserService {
                         "Role is not found: " + Role.Roles.ROLE_USER)
                 );
         user.setRoles(Set.of(role));
-        return userMapper.toDto(userRepository.save(user));
+
+        User savedUser = userRepository.save(user);
+        shoppingCartService.createShoppingCartForUser(savedUser);
+
+        return userMapper.toDto(savedUser);
     }
 }

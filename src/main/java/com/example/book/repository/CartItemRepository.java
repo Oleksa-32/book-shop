@@ -12,7 +12,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long> {
     Optional<CartItem> findByBook_IdAndShoppingCart_Id(Long bookId, Long cartId);
 
     @EntityGraph(attributePaths = {"book", "cart"})
-    @Override
     Optional<CartItem> findById(Long id);
 
     @Modifying
