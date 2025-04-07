@@ -3,7 +3,6 @@ package com.example.book.service.shoppingcart;
 import com.example.book.dto.cartitem.CreateCartItemDto;
 import com.example.book.dto.cartitem.UpdateCartItemDto;
 import com.example.book.dto.shoppingcart.ShoppingCartDto;
-import com.example.book.mapper.BookMapper;
 import com.example.book.mapper.CartItemMapper;
 import com.example.book.mapper.ShoppingCartMapper;
 import com.example.book.model.CartItem;
@@ -12,10 +11,8 @@ import com.example.book.model.User;
 import com.example.book.repository.BookRepository;
 import com.example.book.repository.CartItemRepository;
 import com.example.book.repository.ShoppingCartRepository;
-import com.example.book.service.BookService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -40,7 +37,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto addItemToCart(CreateCartItemDto createCartItemDto, Long userId) {
         ShoppingCart cart = shoppingCartRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("can't find cart with userid: " + userId));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "can't find cart with userid: " + userId)
+                );
         if (!bookRepository.existsById(createCartItemDto.getBookId())) {
             throw new EntityNotFoundException("Can't find book with user id" + userId);
         }

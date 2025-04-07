@@ -8,7 +8,6 @@ import com.example.book.model.User;
 public interface ShoppingCartService {
     ShoppingCartDto findByUserId(Long userId);
 
-
     ShoppingCartDto addItemToCart(CreateCartItemDto createCartItemDto, Long userId);
 
     ShoppingCartDto update(Long cartItemId, UpdateCartItemDto updateCartItemDto);
