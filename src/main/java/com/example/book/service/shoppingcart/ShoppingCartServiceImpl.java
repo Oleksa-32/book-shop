@@ -5,6 +5,7 @@ import com.example.book.dto.cartitem.UpdateCartItemDto;
 import com.example.book.dto.shoppingcart.ShoppingCartDto;
 import com.example.book.mapper.CartItemMapper;
 import com.example.book.mapper.ShoppingCartMapper;
+import com.example.book.model.Book;
 import com.example.book.model.CartItem;
 import com.example.book.model.ShoppingCart;
 import com.example.book.model.User;
@@ -13,6 +14,7 @@ import com.example.book.repository.CartItemRepository;
 import com.example.book.repository.ShoppingCartRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,16 +38,30 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartDto addItemToCart(CreateCartItemDto createCartItemDto, Long userId) {
+        Book book = bookRepository.findById(createCartItemDto.getBookId())
+                .orElseThrow(() -> new EntityNotFoundException("can't find book with id "
+                        + createCartItemDto.getBookId()));
         ShoppingCart cart = shoppingCartRepository.findByUserId(userId)
                 .orElseThrow(() -> new EntityNotFoundException(
                         "can't find cart with userid: " + userId)
                 );
-        if (!bookRepository.existsById(createCartItemDto.getBookId())) {
-            throw new EntityNotFoundException("Can't find book with user id" + userId);
+
+        Long bookId = createCartItemDto.getBookId();
+        Optional<CartItem> existingCartItem = cartItemRepository
+                .findByBook_IdAndShoppingCart_Id(bookId, userId);
+
+        if (existingCartItem.isEmpty()) {
+            CartItem newCartItem = cartItemMapper.createToModel(createCartItemDto);
+            newCartItem.setBook(book);
+            newCartItem.setShoppingCart(cart);
+            cart.getCartItems().add(newCartItem);
+            cartItemRepository.save(newCartItem);
+        } else {
+            CartItem existingItem = existingCartItem.get();
+            int newQuantity = existingItem.getQuantity() + createCartItemDto.getQuantity();
+            existingItem.setQuantity(newQuantity);
+            cartItemRepository.save(existingItem);
         }
-        CartItem cartItem = cartItemMapper.toModel(createCartItemDto);
-        cartItem.setShoppingCart(cart);
-        cartItemRepository.save(cartItem);
         return shoppingCartMapper.toDto(cart);
     }
 
