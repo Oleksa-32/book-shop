@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class CreateOrderRequestDto {
-    @NotBlank(message = "Shipping Adress is required")
+    @NotBlank(message = "Shipping Address is required")
     private String shippingAddress;
 }

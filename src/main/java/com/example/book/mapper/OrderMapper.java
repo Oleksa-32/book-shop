@@ -6,18 +6,22 @@ import com.example.book.dto.order.OrderDto;
 import com.example.book.model.CartItem;
 import com.example.book.model.Order;
 import com.example.book.model.ShoppingCart;
-import org.mapstruct.*;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
+import org.mapstruct.AfterMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 @Mapper(config = MapperConfig.class, uses = {OrderItemMapper.class})
 public interface OrderMapper {
-    @Mapping(source = "user.id", target = "userId")
+    @Mapping(source = "user.id", target = "id")
     OrderDto toDto(Order order);
+
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "shippingAddress", source = "orderDto.shippingAddress")
+    @Mapping(target = "shippingAddress", source = "orderRequestDto.shippingAddress")
     @Mapping(target = "total", source = "cart.cartItems",
             qualifiedByName = "getTotalPriceForOrder")
     Order toCreateReadyOrderFromCart(ShoppingCart cart, CreateOrderRequestDto orderRequestDto);

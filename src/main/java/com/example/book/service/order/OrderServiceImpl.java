@@ -18,13 +18,12 @@ import com.example.book.repository.order.OrderRepository;
 import com.example.book.security.SecurityUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
@@ -36,10 +35,11 @@ public class OrderServiceImpl implements OrderService {
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
     private final CartItemRepository cartItemRepository;
+
     @Override
     public List<OrderDto> getOrders(Pageable pageable) {
         Long userId = SecurityUtil.getLoggedInUserId();
-        return orderRepository.findAllByUserById(userId, pageable)
+        return orderRepository.findAllByUser_Id(userId, pageable)
                 .stream()
                 .map(orderMapper::toDto)
                 .toList();
@@ -86,7 +86,8 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderDto updateItemStatus(Long orderId, UpdateOrderStatusRequestDto updateOrderStatusRequestDto) {
+    public OrderDto updateItemStatus(Long orderId,
+                                     UpdateOrderStatusRequestDto updateOrderStatusRequestDto) {
         Long userId = SecurityUtil.getLoggedInUserId();
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new EntityNotFoundException("Order "
