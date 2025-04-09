@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Entity
 @Table(name = "orders")
@@ -34,9 +35,9 @@ public class Order {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private StatusName statusName;
-
     @Column(nullable = false)
     private BigDecimal total;
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime orderDate;
     @Column(nullable = false)
