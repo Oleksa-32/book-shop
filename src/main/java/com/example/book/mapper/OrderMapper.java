@@ -7,7 +7,6 @@ import com.example.book.model.CartItem;
 import com.example.book.model.Order;
 import com.example.book.model.ShoppingCart;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Set;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
@@ -29,11 +28,6 @@ public interface OrderMapper {
     @AfterMapping
     default void setDefaultStatus(@MappingTarget Order order) {
         order.setStatusName(Order.StatusName.PENDING);
-    }
-
-    @AfterMapping
-    default void setCurrentTime(@MappingTarget Order order) {
-        order.setOrderDate(LocalDateTime.now());
     }
 
     @Named("getTotalPriceForOrder")

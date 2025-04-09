@@ -9,9 +9,9 @@ import com.example.book.service.shoppingcart.ShoppingCartService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +45,7 @@ public class OrderController {
     @GetMapping
     @Operation(summary = "Get all user orders",
             description = "Get all user orders of currently authorized user")
-    public List<OrderDto> getAllOrders(@ParameterObject Pageable pageable) {
+    public Page<OrderDto> getAllOrders(@ParameterObject Pageable pageable) {
         return orderService.getOrders(pageable);
     }
 
@@ -54,7 +54,7 @@ public class OrderController {
     @Operation(summary = "Get all items of user order",
             description = "Get all items for selected order "
                     + "of currently authorized user")
-    public List<OrderItemDto> getAllOrders(@PathVariable Long orderId,
+    public Page<OrderItemDto> getAllOrders(@PathVariable Long orderId,
                                            @ParameterObject Pageable pageable) {
         return orderService.getOrderItems(orderId, pageable);
     }
@@ -73,8 +73,7 @@ public class OrderController {
     @Operation(summary = "Change item status",
             description = "Change status for any selected order")
     public OrderDto updateOrderStatus(@PathVariable Long orderId,
-                                      @Valid
-                                      @RequestBody UpdateOrderStatusRequestDto
+                                      @Valid @RequestBody UpdateOrderStatusRequestDto
                                               orderStatusRequestDto) {
         return orderService.updateItemStatus(orderId, orderStatusRequestDto);
     }
