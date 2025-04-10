@@ -27,7 +27,7 @@ public interface OrderMapper {
 
     @AfterMapping
     default void setDefaultStatus(@MappingTarget Order order) {
-        order.setStatusName(Order.StatusName.PENDING);
+        order.setStatus(Order.StatusName.PENDING);
     }
 
     @Named("getTotalPriceForOrder")

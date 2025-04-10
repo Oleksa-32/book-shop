@@ -36,7 +36,7 @@ public class OrderItem {
     private int quantity;
     @Column(nullable = false)
     private BigDecimal price;
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "tinyint(1)")
     private boolean isDeleted = false;
 
 }

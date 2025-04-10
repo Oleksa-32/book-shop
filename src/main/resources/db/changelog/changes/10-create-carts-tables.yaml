@@ -2,15 +2,25 @@ databaseChangeLog:
   - changeSet:
       id: create-carts-table
       author: oleksa
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: shopping_carts
       changes:
         - createTable:
-            tableName: carts
+            tableName: shopping_carts
             columns:
               - column:
                   name: id
                   type: bigint
                   constraints:
                     primaryKey: true
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  constraints:
                     nullable: false
               - column:
                   name: is_deleted
@@ -20,7 +30,7 @@ databaseChangeLog:
                     nullable: false
         - addForeignKeyConstraint:
             baseColumnNames: id
-            baseTableName: carts
-            constraintName: fk_carts_users
+            baseTableName: shopping_carts
+            constraintName: fk_shopping_carts_users
             referencedColumnNames: id
             referencedTableName: users

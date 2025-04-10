@@ -33,7 +33,7 @@ databaseChangeLog:
                   baseTableName: cart_items
                   constraintName: fk_cart_items_carts
                   referencedColumnNames: id
-                  referencedTableName: carts
+                  referencedTableName: shopping_carts
               - addForeignKeyConstraint:
                   baseColumnNames: book_id
                   baseTableName: cart_items

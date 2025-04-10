@@ -32,7 +32,7 @@ public class OrderController {
     private final ShoppingCartService cartService;
     private final OrderService orderService;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create order",
@@ -41,7 +41,7 @@ public class OrderController {
         return orderService.save(requestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping
     @Operation(summary = "Get all user orders",
             description = "Get all user orders of currently authorized user")
@@ -49,7 +49,7 @@ public class OrderController {
         return orderService.getOrders(pageable);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("{orderId}/items")
     @Operation(summary = "Get all items of user order",
             description = "Get all items for selected order "
@@ -59,7 +59,7 @@ public class OrderController {
         return orderService.getOrderItems(orderId, pageable);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("{orderId}/items/{itemId}")
     @Operation(summary = "Get item by id of user order",
             description = "Select item by id for selected order "
@@ -68,7 +68,7 @@ public class OrderController {
         return orderService.getOrderItemById(orderId, itemId);
     }
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("{orderId}")
     @Operation(summary = "Change item status",
             description = "Change status for any selected order")
