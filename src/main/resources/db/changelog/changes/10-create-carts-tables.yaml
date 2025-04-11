@@ -2,14 +2,18 @@ databaseChangeLog:
   - changeSet:
       id: create-carts-table
       author: oleksa
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: shopping_carts
       changes:
         - createTable:
-            tableName: carts
+            tableName: shopping_carts
             columns:
               - column:
                   name: id
                   type: bigint
-                  autoIncrement: true
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -24,9 +28,9 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
-              - addForeignKeyConstraint:
-                  baseColumnNames: user_id
-                  baseTableName: carts
-                  constraintName: fk_carts_users
-                  referencedColumnNames: id
-                  referencedTableName: users
+        - addForeignKeyConstraint:
+            baseColumnNames: id
+            baseTableName: shopping_carts
+            constraintName: fk_shopping_carts_users
+            referencedColumnNames: id
+            referencedTableName: users
