@@ -33,7 +33,7 @@ public class Order {
     private User user;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusName statusName;
+    private StatusName status;
 
     @Column(nullable = false)
     private BigDecimal total;
