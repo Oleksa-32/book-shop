@@ -5,7 +5,6 @@ import com.example.book.dto.category.CategoryDto;
 import com.example.book.dto.category.CreateCategoryRequestDto;
 import com.example.book.dto.category.UpdateCategoryRequestDto;
 import com.example.book.model.Category;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
@@ -13,10 +12,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-@Mapper(config = MapperConfig.class)
+@Mapper(componentModel = "spring", config = MapperConfig.class)
 public interface CategoryMapper {
 
-    @Mapping(target = "id", ignore = true)
     CategoryDto toDto(Category category);
 
     Category toModel(CreateCategoryRequestDto createCategoryRequestDto);
@@ -26,16 +24,14 @@ public interface CategoryMapper {
                        @MappingTarget Category category);
 
     @Named("categoriesByIds")
-    default Set<Category> mapCategoriesIdsToCategories(Set<Long> categoryIds) {
-        if (categoryIds == null || categoryIds.isEmpty()) {
-            return new HashSet<>();
+    default Set<Category> categoriesByIds(Set<Long> ids) {
+        if (ids == null) {
+            return null;
         }
-        return categoryIds.stream()
-                .map(id -> {
-                    Category category = new Category();
-                    category.setId(id);
-                    return category;
-                })
-                .collect(Collectors.toSet());
+        return ids.stream().map(id -> {
+            Category category = new Category();
+            category.setId(id);
+            return category;
+        }).collect(Collectors.toSet());
     }
 }

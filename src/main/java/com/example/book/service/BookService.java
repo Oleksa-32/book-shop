@@ -4,6 +4,7 @@ import com.example.book.dto.book.BookDto;
 import com.example.book.dto.book.BookDtoWithoutCategoryIds;
 import com.example.book.dto.book.BookSearchParametersDto;
 import com.example.book.dto.book.CreateBookRequestDto;
+import com.example.book.dto.book.UpdateBookRequestDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +15,7 @@ public interface BookService {
 
     Page<BookDto> findAll(Pageable pageable);
 
-    BookDto updateBook(Long id, BookDto updateRequest);
+    BookDto updateBook(Long id, UpdateBookRequestDto updateRequest);
 
     Page<BookDtoWithoutCategoryIds> findByCategoryId(Long id, Pageable pageable);
 
