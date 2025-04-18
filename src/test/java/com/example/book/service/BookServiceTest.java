@@ -4,10 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,7 +37,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 
 @ExtendWith(MockitoExtension.class)
@@ -96,91 +93,91 @@ public class BookServiceTest {
     }
 
     @Test
-    @DisplayName("Ensure that retrieving books with any Pageable argument returns the"
-            + " correct BookDto list")
-    public void retrieveAllBooks_returnsExpectedDtoPage() {
+    @DisplayName("retrieveAllBooks returns expected Page<BookDto>")
+    void retrieveAllBooks_returnsExpectedDtoPage() {
         Page<Book> bookPage = new PageImpl<>(bookList);
+        PageRequest pageRequest = PageRequest.of(0, 10);
 
-        when(bookRepository.findAll(any(Pageable.class))).thenReturn(bookPage);
+        when(bookRepository.findAll(pageRequest)).thenReturn(bookPage);
 
         List<BookDto> expectedBookDtoList = bookList.stream()
                 .map(bookMapper::toDto)
                 .toList();
 
-        Page<BookDto> actualList = bookService.findAll(PageRequest.of(0, 10));
+        Page<BookDto> actualList = bookService.findAll(pageRequest);
 
         assertFalse(actualList.isEmpty());
         assertEquals(expectedBookDtoList.size(), actualList.getNumberOfElements());
         assertEquals(expectedBookDtoList, actualList.getContent());
 
-        verify(bookRepository).findAll(any(Pageable.class));
+        verify(bookRepository).findAll(pageRequest);
     }
 
     @Test
-    @DisplayName("Ensure that searching books with valid parameters and a Pageable"
-            + " argument returns the expected BookDto list")
-    public void searchBooks_withValidParameters_returnsExpectedDtoPage() {
+    @DisplayName("searchBooks with valid parameters returns expected Page<BookDto>")
+    void searchBooks_withValidParameters_returnsExpectedDtoPage() {
         String searchBy = "s";
-
         List<Book> filteredByCharInNameList = bookList.stream()
                 .filter(b -> b.getTitle().contains(searchBy))
                 .toList();
-
         Page<Book> filteredBookPage = new PageImpl<>(filteredByCharInNameList);
+        PageRequest pageRequest = PageRequest.of(0, 10);
+
         BookSearchParametersDto searchParametersDto = new BookSearchParametersDto(
-                new String[]{searchBy}, new String[]{}, new String[]{});
-        Specification<Book> bookSpecification = bookSpecificationBuilder
-                .build(searchParametersDto);
+                new String[]{searchBy}, new String[]{}, new String[]{}
+        );
+        Specification<Book> bookSpecification = mock(Specification.class);
 
         when(bookSpecificationBuilder.build(searchParametersDto)).thenReturn(bookSpecification);
-        when(bookRepository.findAll(eq(bookSpecification), any(Pageable.class)))
+        when(bookRepository.findAll(bookSpecification, pageRequest))
                 .thenReturn(filteredBookPage);
+
         List<BookDto> expectedFilterBookDto = filteredByCharInNameList.stream()
                 .map(bookMapper::toDto)
                 .toList();
 
-        Page<BookDto> actualList = bookService.search(searchParametersDto, PageRequest.of(0, 10));
+        Page<BookDto> actualList = bookService.search(searchParametersDto, pageRequest);
 
         assertFalse(actualList.isEmpty());
         assertEquals(expectedFilterBookDto.size(), actualList.getNumberOfElements());
         assertEquals(expectedFilterBookDto, actualList.getContent());
 
-        verify(bookRepository, times(1)).findAll(eq(bookSpecification), any(Pageable.class));
-        verify(bookSpecificationBuilder, times(2)).build(searchParametersDto);
+        verify(bookSpecificationBuilder).build(searchParametersDto);
+        verify(bookRepository).findAll(bookSpecification, pageRequest);
     }
 
     @Test
-    @DisplayName("Ensure that retrieving books by a valid category id returns the expected"
-            + " BookDto list without category details")
-    public void findBooksByCategory_returnsExpectedDtoWithoutCategoryIds() {
+    @DisplayName("findByCategoryId returns expected Page<BookDtoWithoutCategoryIds>")
+    void findBooksByCategory_returnsExpectedDtoWithoutCategoryIds() {
         Long categoryId = 1L;
         List<Book> filteredByCategoryId = bookList.stream()
                 .filter(b -> b.getCategories().stream().anyMatch(c -> c.getId().equals(categoryId)))
                 .toList();
         Page<Book> filteredBooksPage = new PageImpl<>(filteredByCategoryId);
+        PageRequest pageRequest = PageRequest.of(0, 10);
 
         when(categoryRepository.existsById(categoryId)).thenReturn(true);
-        when(bookRepository.findByCategoryId(eq(categoryId), any(Pageable.class)))
+        when(bookRepository.findByCategoryId(categoryId, pageRequest))
                 .thenReturn(filteredBooksPage);
 
         List<BookDtoWithoutCategoryIds> expectedFilterBookDto = filteredByCategoryId.stream()
                 .map(bookMapper::toDtoWithoutCategories)
                 .toList();
 
-        Page<BookDtoWithoutCategoryIds> actualList = bookService.findByCategoryId(categoryId,
-                PageRequest.of(0, 10));
+        Page<BookDtoWithoutCategoryIds> actualList = bookService
+                .findByCategoryId(categoryId, pageRequest);
 
         assertFalse(actualList.isEmpty());
         assertEquals(expectedFilterBookDto.size(), actualList.getNumberOfElements());
         assertEquals(expectedFilterBookDto, actualList.getContent());
 
-        verify(bookRepository, times(1)).findByCategoryId(eq(categoryId), any(Pageable.class));
-        verify(categoryRepository, times(1)).existsById(categoryId);
+        verify(categoryRepository).existsById(categoryId);
+        verify(bookRepository).findByCategoryId(categoryId, pageRequest);
     }
 
     @Test
-    @DisplayName("Ensure that retrieving a book by a valid id returns the correct BookDto")
-    public void retrieveBookById_returnsExpectedDto() {
+    @DisplayName("retrieveBookById returns expected BookDto")
+    void retrieveBookById_returnsExpectedDto() {
         Long validBookId = 3L;
         Book book = TestDataUtil.book(categoryList);
         BookDto expectedBookDto = TestDataUtil.mapToBookDto(book);
@@ -193,13 +190,14 @@ public class BookServiceTest {
         assertNotNull(actualbookDto);
         assertEquals(expectedBookDto, actualbookDto);
 
-        verify(bookRepository, times(1)).findById(validBookId);
+        verify(bookRepository).findById(validBookId);
     }
 
     @Test
-    @DisplayName("Expect an exception when retrieving a book with an invalid id")
-    public void retrieveBookById_withInvalidId_throwsException() {
+    @DisplayName("retrieveBookById with invalid id throws exception")
+    void retrieveBookById_withInvalidId_throwsException() {
         Long invalidBookId = 5L;
+        UpdateBookRequestDto updateBookRequestDto = TestDataUtil.updateBookRequestDto();
         when(bookRepository.findById(invalidBookId)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
@@ -207,28 +205,25 @@ public class BookServiceTest {
                 () -> bookService.findById(invalidBookId)
         );
 
-        String expectedMessage = "Can't find book with id " + invalidBookId;
-        String actualMessage = exception.getMessage();
-        assertEquals(expectedMessage, actualMessage);
-        verify(bookRepository, times(1)).findById(invalidBookId);
+        assertEquals("Can't find book with id " + invalidBookId, exception.getMessage());
+        verify(bookRepository).findById(invalidBookId);
     }
 
     @Test
-    @DisplayName("Ensure that calling deleteBook with a valid id invokes"
-            + " the repository's deleteById method")
-    public void deleteBook_withValidId_callsRepositoryDelete() {
+    @DisplayName("deleteBook with valid id invokes deleteById")
+    void deleteBook_withValidId_callsRepositoryDelete() {
         Long validBookId = 1L;
-
         when(bookRepository.existsById(validBookId)).thenReturn(true);
+
         bookService.deleteBook(validBookId);
 
         verify(bookRepository).existsById(validBookId);
-        verify(bookRepository, times(1)).deleteById(validBookId);
+        verify(bookRepository).deleteById(validBookId);
     }
 
     @Test
-    @DisplayName("Ensure that updating a book with a valid id returns the updated BookDto")
-    public void updateBook_withValidId_returnsUpdatedDto() {
+    @DisplayName("updateBook with valid id returns updated BookDto")
+    void updateBook_withValidId_returnsUpdatedDto() {
         Long validBookId = 2L;
         UpdateBookRequestDto updateBookRequestDto = TestDataUtil.updateBookRequestDto();
 
@@ -236,8 +231,8 @@ public class BookServiceTest {
                 .filter(b -> b.getId().equals(validBookId))
                 .findFirst()
                 .orElseThrow();
-        when(bookRepository.findById(validBookId)).thenReturn(Optional.of(bookToUpdate));
 
+        when(bookRepository.findById(validBookId)).thenReturn(Optional.of(bookToUpdate));
         doAnswer(invocation -> {
             Book bookArg = invocation.getArgument(1);
             bookArg.setTitle(updateBookRequestDto.getTitle());
@@ -248,58 +243,57 @@ public class BookServiceTest {
                     .filter(c -> updateBookRequestDto.getCategoryIds().contains(c.getId()))
                     .collect(Collectors.toSet()));
             return null;
-        }).when(bookMapper).updateBookFromDto(eq(updateBookRequestDto), any(Book.class));
+        }).when(bookMapper).updateBookFromDto(updateBookRequestDto, bookToUpdate);
+
         when(bookRepository.save(bookToUpdate)).thenReturn(bookToUpdate);
-
         BookDto expectedBookDto = TestDataUtil.mapToBookDto(validBookId, updateBookRequestDto);
-
         when(bookMapper.toDto(bookToUpdate)).thenReturn(expectedBookDto);
 
         BookDto actualBookDto = bookService.updateBook(validBookId, updateBookRequestDto);
 
         assertNotNull(actualBookDto);
         assertEquals(expectedBookDto, actualBookDto);
-        verify(bookRepository, times(1)).findById(validBookId);
-        verify(bookMapper, times(1)).updateBookFromDto(eq(updateBookRequestDto), any(Book.class));
-        verify(bookRepository, times(1)).save(bookToUpdate);
-        verify(bookMapper, times(1)).toDto(bookToUpdate);
+
+        verify(bookRepository).findById(validBookId);
+        verify(bookMapper).updateBookFromDto(updateBookRequestDto, bookToUpdate);
+        verify(bookRepository).save(bookToUpdate);
+        verify(bookMapper).toDto(bookToUpdate);
     }
 
     @Test
-    @DisplayName("Expect an exception when attempting to update a book with an invalid id")
-    public void updateBook_withInvalidId_throwsException() {
+    @DisplayName("updateBook with invalid id throws exception")
+    void updateBook_withInvalidId_throwsException() {
         Long invalidBookId = 5L;
+        UpdateBookRequestDto updateBookRequestDto = TestDataUtil.updateBookRequestDto();
         when(bookRepository.findById(invalidBookId)).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(
                 EntityNotFoundException.class,
-                () -> bookService.updateBook(invalidBookId, any(UpdateBookRequestDto.class))
+                () -> bookService.updateBook(invalidBookId, updateBookRequestDto)
         );
 
-        String expectedMessage = "Book with id " + invalidBookId + " not found";
-        String actualMessage = exception.getMessage();
-        assertEquals(expectedMessage, actualMessage);
-        verify(bookRepository, times(1)).findById(invalidBookId);
+        assertEquals("Book with id " + invalidBookId + " not found", exception.getMessage());
+        verify(bookRepository).findById(invalidBookId);
     }
 
     @Test
-    @DisplayName("Ensure that saving a book with a valid create request"
-            + " returns the correct BookDto")
-    public void createBook_withValidRequest_returnsExpectedDto() {
+    @DisplayName("save with valid request returns expected BookDto")
+    void createBook_withValidRequest_returnsExpectedDto() {
         CreateBookRequestDto createBookRequestDto = TestDataUtil.createBookRequestDto();
         Book book = TestDataUtil.mapToBook(createBookRequestDto, categoryList);
         BookDto expectedBookDto = TestDataUtil.mapToBookDto(book);
 
         when(bookMapper.toModel(createBookRequestDto)).thenReturn(book);
-        when(bookMapper.toDto(book)).thenReturn(expectedBookDto);
         when(bookRepository.save(book)).thenReturn(book);
+        when(bookMapper.toDto(book)).thenReturn(expectedBookDto);
 
         BookDto actualBookDto = bookService.save(createBookRequestDto);
 
         assertNotNull(actualBookDto);
         assertEquals(expectedBookDto, actualBookDto);
-        verify(bookMapper, times(1)).toModel(createBookRequestDto);
-        verify(bookMapper, times(1)).toDto(book);
-        verify(bookRepository, times(1)).save(book);
+
+        verify(bookMapper).toModel(createBookRequestDto);
+        verify(bookRepository).save(book);
+        verify(bookMapper).toDto(book);
     }
 }

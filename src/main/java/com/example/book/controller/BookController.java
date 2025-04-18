@@ -56,7 +56,7 @@ public class BookController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update book", description = "Updates a book's details")
     public BookDto updateBook(@PathVariable Long id,
-                              @RequestBody UpdateBookRequestDto updateRequest) {
+                              @RequestBody @Valid UpdateBookRequestDto updateRequest) {
         return bookService.updateBook(id, updateRequest);
     }
 

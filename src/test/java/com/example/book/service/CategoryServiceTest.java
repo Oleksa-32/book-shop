@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -73,12 +72,13 @@ public class CategoryServiceTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Category> categoryPage = new PageImpl<>(categoryList);
 
-        when(categoryRepository.findAll(any(Pageable.class))).thenReturn(categoryPage);
+        when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
 
         for (Category category : categoryList) {
             when(categoryMapper.toDto(category)).thenReturn(
-                    categoryDtoList.stream().filter(dto -> dto.getId().equals(category
-                            .getId())).findFirst().orElse(null)
+                    categoryDtoList.stream()
+                            .filter(dto -> dto.getId().equals(category.getId()))
+                            .findFirst().orElse(null)
             );
         }
 
@@ -87,17 +87,19 @@ public class CategoryServiceTest {
         assertFalse(actualPage.isEmpty());
         assertEquals(categoryDtoList.size(), actualPage.getNumberOfElements());
         assertEquals(categoryDtoList, actualPage.getContent());
-        verify(categoryRepository).findAll(any(Pageable.class));
+
+        verify(categoryRepository).findAll(pageable);
     }
 
     @Test
     @DisplayName("Ensure that retrieving a category by valid id returns the correct CategoryDto")
     public void retrieveCategoryById_returnsExpectedDto() {
         Long validId = 3L;
-        Category category = categoryList.stream().filter(cat -> cat.getId().equals(validId))
+        Category category = categoryList.stream()
+                .filter(cat -> cat.getId().equals(validId))
                 .findFirst().orElseThrow();
-        CategoryDto expectedDto = categoryDtoList.stream().filter(dto -> dto.getId()
-                        .equals(validId))
+        CategoryDto expectedDto = categoryDtoList.stream()
+                .filter(dto -> dto.getId().equals(validId))
                 .findFirst().orElseThrow();
 
         when(categoryRepository.findById(validId)).thenReturn(Optional.of(category));
@@ -116,8 +118,10 @@ public class CategoryServiceTest {
         Long invalidId = 10L;
 
         when(categoryRepository.findById(invalidId)).thenReturn(Optional.empty());
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> categoryService.getById(invalidId));
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> categoryService.getById(invalidId)
+        );
         String expectedMessage = "Category with id " + invalidId + " not found";
 
         assertEquals(expectedMessage, exception.getMessage());
@@ -125,11 +129,12 @@ public class CategoryServiceTest {
     }
 
     @Test
-    @DisplayName("Ensure that saving a category with a valid create request returns"
-            + " the expected CategoryDto")
+    @DisplayName("Ensure that saving a category with a valid create"
+            + " request returns the expected CategoryDto")
     public void createCategory_withValidRequest_returnsExpectedDto() {
         CreateCategoryRequestDto createRequest = TestDataUtil.createCategoryRequestDto();
-        Category categoryToSave = new Category().setName(createRequest.getName())
+        Category categoryToSave = new Category()
+                .setName(createRequest.getName())
                 .setDescription(createRequest.getDescription());
         CategoryDto expectedDto = TestDataUtil.mapToCategoryDto(createRequest);
 
@@ -151,10 +156,10 @@ public class CategoryServiceTest {
     @DisplayName("Ensure that updating a category with a valid id returns the updated CategoryDto")
     public void updateCategory_withValidId_returnsUpdatedDto() {
         Long validId = 4L;
-
         UpdateCategoryRequestDto updateRequest = TestDataUtil.updateCategoryRequestDto();
 
-        Category existingCategory = categoryList.stream().filter(cat -> cat.getId().equals(validId))
+        Category existingCategory = categoryList.stream()
+                .filter(cat -> cat.getId().equals(validId))
                 .findFirst().orElseThrow();
         CategoryDto expectedDto = TestDataUtil.mapToCategoryDto(validId, updateRequest);
 
@@ -178,8 +183,10 @@ public class CategoryServiceTest {
         UpdateCategoryRequestDto updateRequest = TestDataUtil.updateCategoryRequestDto();
 
         when(categoryRepository.findById(invalidId)).thenReturn(Optional.empty());
-        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
-                () -> categoryService.update(invalidId, updateRequest));
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class,
+                () -> categoryService.update(invalidId, updateRequest)
+        );
 
         String expectedMessage = "Category with id " + invalidId + " not found";
         assertEquals(expectedMessage, exception.getMessage());
@@ -187,8 +194,8 @@ public class CategoryServiceTest {
     }
 
     @Test
-    @DisplayName("Ensure that calling deleteById with a valid id invokes the"
-            + " repository's delete method")
+    @DisplayName("Ensure that calling deleteById with a valid id invokes"
+            + " the repository's delete method")
     public void deleteCategory_withValidId_callsRepositoryDelete() {
         Long validId = 3L;
 
@@ -199,3 +206,4 @@ public class CategoryServiceTest {
         verify(categoryRepository, times(1)).deleteById(validId);
     }
 }
+

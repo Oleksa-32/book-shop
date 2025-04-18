@@ -16,6 +16,7 @@ import com.example.book.dto.book.UpdateBookRequestDto;
 import com.example.book.utils.TestDataUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
@@ -34,7 +34,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +41,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class BookControllerTest {
     protected static MockMvc mockMvc;
 
@@ -63,15 +61,7 @@ public class BookControllerTest {
             connection.setAutoCommit(true);
             ScriptUtils.executeSqlScript(
                     connection,
-                    new ClassPathResource("database/delete-all.sql")
-            );
-            ScriptUtils.executeSqlScript(
-                    connection,
-                    new ClassPathResource("database/books/add-three-books.sql")
-            );
-            ScriptUtils.executeSqlScript(
-                    connection,
-                    new ClassPathResource("database/books/add-two-categories.sql")
+                    new ClassPathResource("database/books/init-books-and-categories.sql")
             );
 
         }
@@ -96,10 +86,6 @@ public class BookControllerTest {
     }
 
     @Test
-    @Sql(
-            scripts = "classpath:database/books/delete-title-books.sql",
-            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD
-    )
     @WithMockUser(username = "admin", roles = {"ADMIN"})
     @DisplayName("Create a new book")
     void createBook_ValidRequestDto_Success() throws Exception {
@@ -195,5 +181,40 @@ public class BookControllerTest {
         assertNotNull(actual);
         assertEquals(expected.getId(), actual.getId());
         assertEquals(expected.getCategoryIds(), actual.getCategoryIds());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @DisplayName("POST /books with negative price → 400 Bad Request")
+    void createBook_NegativePrice_ReturnsBadRequest() throws Exception {
+        var dto = TestDataUtil.createBookRequestDto();
+        dto.setPrice(BigDecimal.valueOf(-10.00));
+        String json = objectMapper.writeValueAsString(dto);
+
+        mockMvc.perform(post("/books")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @DisplayName("PUT /books/{id} with non‐existent ID → 404 Not Found")
+    void updateBookById_NonExistentId_ReturnsNotFound() throws Exception {
+        var updateReq = TestDataUtil.updateBookRequestDto();
+        String json = objectMapper.writeValueAsString(updateReq);
+
+        mockMvc.perform(put("/books/999")
+                        .content(json)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = {"ADMIN"})
+    @DisplayName("DELETE /books/{id} with negative ID → 404 Not Found")
+    void deleteBookById_NegativeId_ReturnsNotFound() throws Exception {
+        mockMvc.perform(delete("/books/-1"))
+                .andExpect(status().isNotFound());
     }
 }

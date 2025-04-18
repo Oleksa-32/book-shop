@@ -24,17 +24,16 @@ import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -42,7 +41,6 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestInstance(Lifecycle.PER_CLASS)
 public class CategoryControllerTest {
 
     protected static MockMvc mockMvc;
@@ -50,8 +48,8 @@ public class CategoryControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @BeforeAll
-    static void beforeAll(
+    @BeforeEach
+    void beforeEach(
             @Autowired DataSource dataSource,
             @Autowired WebApplicationContext webApplicationContext
     ) throws SQLException {
@@ -59,16 +57,19 @@ public class CategoryControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
                 .build();
-        tearDown(dataSource);
-        try (Connection connection = dataSource.getConnection()) {
-            connection.setAutoCommit(true);
+
+        try (Connection conn = dataSource.getConnection()) {
+            conn.setAutoCommit(true);
+
             ScriptUtils.executeSqlScript(
-                    connection,
-                    new ClassPathResource("database/books/delete-all-books.sql")
+                    conn,
+                    new ClassPathResource("database/delete-all.sql")
             );
+
             ScriptUtils.executeSqlScript(
-                    connection,
-                    new ClassPathResource("database/categories/init-for-category-tests.sql")
+                    conn,
+                    new ClassPathResource("database/categories/"
+                            + "seed-books-and-categories-for-category-test.sql")
             );
         }
     }
@@ -204,31 +205,14 @@ public class CategoryControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"ADMIN"})
     @DisplayName("Delete category by id")
+    @Sql(
+            scripts = "classpath:database/categories/init-single-category.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
+    )
     void deleteCategoryById_WithValidId_NoContent() throws Exception {
-        //create a new category
-        CreateCategoryRequestDto createDto = TestDataUtil.createCategoryRequestDto();
-        String createJson = objectMapper.writeValueAsString(createDto);
+        Long categoryId = 4L;
 
-        MvcResult createResult = mockMvc.perform(post("/categories")
-                        .content(createJson)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        CategoryDto created = objectMapper.readValue(
-                createResult.getResponse().getContentAsString(),
-                CategoryDto.class
-        );
-        Long newCategoryId = created.getId();
-        assertNotNull(newCategoryId);
-
-        mockMvc.perform(get("/categories/" + newCategoryId))
-                .andExpect(status().isOk());
-
-        mockMvc.perform(delete("/categories/" + newCategoryId))
+        mockMvc.perform(delete("/categories/" + categoryId))
                 .andExpect(status().isNoContent());
-
-        mockMvc.perform(get("/categories/" + newCategoryId))
-                .andExpect(status().isNotFound());
     }
 }

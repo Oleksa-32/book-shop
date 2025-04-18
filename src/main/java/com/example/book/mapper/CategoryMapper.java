@@ -12,7 +12,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", config = MapperConfig.class)
+@Mapper(config = MapperConfig.class)
 public interface CategoryMapper {
 
     CategoryDto toDto(Category category);
