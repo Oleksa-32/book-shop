@@ -4,6 +4,7 @@ import com.example.book.dto.book.BookDto;
 import com.example.book.dto.book.BookDtoWithoutCategoryIds;
 import com.example.book.dto.book.BookSearchParametersDto;
 import com.example.book.dto.book.CreateBookRequestDto;
+import com.example.book.dto.book.UpdateBookRequestDto;
 import com.example.book.mapper.BookMapper;
 import com.example.book.model.Book;
 import com.example.book.repository.BookRepository;
@@ -22,7 +23,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder specificationBuilder;
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
@@ -45,7 +46,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto updateBook(Long id, BookDto updateRequest) {
+    public BookDto updateBook(Long id, UpdateBookRequestDto updateRequest) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Book with id " + id + " not found"));
