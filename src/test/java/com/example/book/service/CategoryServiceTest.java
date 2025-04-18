@@ -47,23 +47,23 @@ public class CategoryServiceTest {
 
     @BeforeEach
     void setUp() {
-        Category cat1 = new Category().setId(3L).setName("cooking")
+        Category cookingCategory = new Category().setId(3L).setName("cooking")
                 .setDescription("Cooking category");
-        Category cat2 = new Category().setId(4L).setName("IT guides")
+        Category itGuidesCategory = new Category().setId(4L).setName("IT guides")
                 .setDescription("IT guides category");
-        Category cat3 = new Category().setId(5L).setName("novel")
+        Category novelCategory = new Category().setId(5L).setName("novel")
                 .setDescription("Novel category");
 
-        categoryList = List.of(cat1, cat2, cat3);
+        categoryList = List.of(cookingCategory, itGuidesCategory, novelCategory);
 
-        CategoryDto dto1 = new CategoryDto().setId(3L).setName("cooking")
+        CategoryDto cookingDto = new CategoryDto().setId(3L).setName("cooking")
                 .setDescription("Cooking category");
-        CategoryDto dto2 = new CategoryDto().setId(4L).setName("IT guides")
+        CategoryDto itGuidesDto = new CategoryDto().setId(4L).setName("IT guides")
                 .setDescription("IT guides category");
-        CategoryDto dto3 = new CategoryDto().setId(5L).setName("novel")
+        CategoryDto novelDto = new CategoryDto().setId(5L).setName("novel")
                 .setDescription("Novel category");
 
-        categoryDtoList = List.of(dto1, dto2, dto3);
+        categoryDtoList = List.of(cookingDto, itGuidesDto, novelDto);
     }
 
     @Test
