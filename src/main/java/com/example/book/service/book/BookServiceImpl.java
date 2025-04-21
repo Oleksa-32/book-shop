@@ -10,7 +10,6 @@ import com.example.book.model.Book;
 import com.example.book.repository.BookRepository;
 import com.example.book.repository.CategoryRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
-import com.example.book.service.book.BookService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
