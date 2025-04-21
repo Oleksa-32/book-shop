@@ -1,8 +1,6 @@
 package com.example.book.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +17,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
@@ -38,7 +35,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class CategoryControllerTest {
@@ -111,9 +107,11 @@ public class CategoryControllerTest {
         CategoryDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), CategoryDto.class);
 
-        assertNotNull(actual);
-        assertNotNull(actual.getId());
-        assertTrue(EqualsBuilder.reflectionEquals(categoryDto, actual, "id"));
+        assertThat(actual.getId()).isNotNull();
+        assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(categoryDto);
     }
 
     @Test
@@ -127,14 +125,10 @@ public class CategoryControllerTest {
                 .andReturn();
 
         JsonNode root = objectMapper.readTree(result.getResponse().getContentAsByteArray());
-
         JsonNode contentNode = root.has("content") ? root.get("content") : root;
-
         CategoryDto[] actual = objectMapper.treeToValue(contentNode, CategoryDto[].class);
 
-        assertNotNull(actual);
-        assertEquals(expected.size(), actual.length);
-        assertEquals(expected, Arrays.asList(actual));
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
     @Test
@@ -155,9 +149,7 @@ public class CategoryControllerTest {
         BookDtoWithoutCategoryIds[] actual = objectMapper.treeToValue(contentNode,
                 BookDtoWithoutCategoryIds[].class);
 
-        assertNotNull(actual);
-        assertEquals(expected.size(), actual.length);
-        assertEquals(expected, Arrays.asList(actual));
+        assertThat(actual).containsExactlyElementsOf(expected);
     }
 
     @Test
@@ -166,7 +158,6 @@ public class CategoryControllerTest {
     void updateBookById_WithValidInput_ReturnsUpdatedBook() throws Exception {
         Long categoryId = 4L;
         UpdateCategoryRequestDto updateRequestDto = TestDataUtil.updateCategoryRequestDto();
-
         CategoryDto expected = TestDataUtil.mapToCategoryDto(categoryId, updateRequestDto);
 
         String jsonRequest = objectMapper.writeValueAsString(updateRequestDto);
@@ -180,8 +171,7 @@ public class CategoryControllerTest {
         CategoryDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsString(), CategoryDto.class);
 
-        assertNotNull(actual);
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -197,9 +187,8 @@ public class CategoryControllerTest {
 
         CategoryDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsByteArray(), CategoryDto.class);
-        assertNotNull(actual);
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected, actual);
+
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test

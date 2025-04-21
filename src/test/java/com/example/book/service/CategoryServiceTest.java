@@ -1,9 +1,7 @@
 package com.example.book.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,6 +12,7 @@ import com.example.book.dto.category.UpdateCategoryRequestDto;
 import com.example.book.mapper.CategoryMapper;
 import com.example.book.model.Category;
 import com.example.book.repository.CategoryRepository;
+import com.example.book.service.category.CategoryServiceImpl;
 import com.example.book.utils.TestDataUtil;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
@@ -74,20 +73,17 @@ public class CategoryServiceTest {
 
         when(categoryRepository.findAll(pageable)).thenReturn(categoryPage);
 
-        for (Category category : categoryList) {
-            when(categoryMapper.toDto(category)).thenReturn(
-                    categoryDtoList.stream()
-                            .filter(dto -> dto.getId().equals(category.getId()))
-                            .findFirst().orElse(null)
-            );
-        }
+        categoryList.forEach(cat ->
+                when(categoryMapper.toDto(cat))
+                        .thenReturn(categoryDtoList.stream()
+                                .filter(dto -> dto.getId().equals(cat.getId()))
+                                .findFirst().orElseThrow())
+        );
 
         Page<CategoryDto> actualPage = categoryService.findAll(pageable);
 
-        assertFalse(actualPage.isEmpty());
-        assertEquals(categoryDtoList.size(), actualPage.getNumberOfElements());
-        assertEquals(categoryDtoList, actualPage.getContent());
-
+        assertThat(actualPage.getContent())
+                .containsExactlyElementsOf(categoryDtoList);
         verify(categoryRepository).findAll(pageable);
     }
 
@@ -107,8 +103,7 @@ public class CategoryServiceTest {
 
         CategoryDto actualDto = categoryService.getById(validId);
 
-        assertNotNull(actualDto);
-        assertEquals(expectedDto, actualDto);
+        assertThat(actualDto).isEqualTo(expectedDto);
         verify(categoryRepository).findById(validId);
     }
 
@@ -117,14 +112,9 @@ public class CategoryServiceTest {
     public void retrieveCategoryById_withInvalidId_throwsException() {
         Long invalidId = 10L;
 
-        when(categoryRepository.findById(invalidId)).thenReturn(Optional.empty());
-        EntityNotFoundException exception = assertThrows(
-                EntityNotFoundException.class,
-                () -> categoryService.getById(invalidId)
-        );
-        String expectedMessage = "Category with id " + invalidId + " not found";
-
-        assertEquals(expectedMessage, exception.getMessage());
+        assertThatThrownBy(() -> categoryService.getById(invalidId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Category with id " + invalidId + " not found");
         verify(categoryRepository).findById(invalidId);
     }
 
@@ -144,8 +134,7 @@ public class CategoryServiceTest {
 
         CategoryDto actualDto = categoryService.save(createRequest);
 
-        assertNotNull(actualDto);
-        assertEquals(expectedDto, actualDto);
+        assertThat(actualDto).isEqualTo(expectedDto);
 
         verify(categoryMapper).toModel(createRequest);
         verify(categoryRepository).save(categoryToSave);
@@ -169,8 +158,7 @@ public class CategoryServiceTest {
 
         CategoryDto actualDto = categoryService.update(validId, updateRequest);
 
-        assertNotNull(actualDto);
-        assertEquals(expectedDto, actualDto);
+        assertThat(actualDto).isEqualTo(expectedDto);
         verify(categoryRepository).findById(validId);
         verify(categoryRepository).save(existingCategory);
         verify(categoryMapper).toDto(existingCategory);
@@ -183,13 +171,9 @@ public class CategoryServiceTest {
         UpdateCategoryRequestDto updateRequest = TestDataUtil.updateCategoryRequestDto();
 
         when(categoryRepository.findById(invalidId)).thenReturn(Optional.empty());
-        EntityNotFoundException exception = assertThrows(
-                EntityNotFoundException.class,
-                () -> categoryService.update(invalidId, updateRequest)
-        );
-
-        String expectedMessage = "Category with id " + invalidId + " not found";
-        assertEquals(expectedMessage, exception.getMessage());
+        assertThatThrownBy(() -> categoryService.update(invalidId, updateRequest))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Category with id " + invalidId + " not found");
         verify(categoryRepository).findById(invalidId);
     }
 

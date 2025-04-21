@@ -1,8 +1,6 @@
 package com.example.book.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -19,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
@@ -30,7 +27,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -38,7 +34,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class BookControllerTest {
@@ -90,7 +85,6 @@ public class BookControllerTest {
     @DisplayName("Create a new book")
     void createBook_ValidRequestDto_Success() throws Exception {
         CreateBookRequestDto requestDto = TestDataUtil.createBookRequestDto();
-
         BookDto bookDto = TestDataUtil.mapToBookDto(requestDto);
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
@@ -104,9 +98,13 @@ public class BookControllerTest {
         BookDto actual = objectMapper.readValue(result.getResponse().getContentAsString(),
                 BookDto.class);
 
-        assertNotNull(actual);
-        assertNotNull(actual.getId());
-        assertTrue(EqualsBuilder.reflectionEquals(bookDto, actual, "id", "categoryIds"));
+        assertThat(actual)
+                .extracting(BookDto::getId)
+                .isNotNull();
+        assertThat(actual)
+                .usingRecursiveComparison()
+                .ignoringFields("id")
+                .isEqualTo(bookDto);
     }
 
     @Test
@@ -124,9 +122,8 @@ public class BookControllerTest {
 
         BookDto[] actual = objectMapper.treeToValue(contentNode, BookDto[].class);
 
-        assertNotNull(actual);
-        assertEquals(expected.size(), actual.length);
-        assertEquals(expected, Arrays.stream(actual).toList());
+        assertThat(actual)
+                .containsExactlyElementsOf(expected);
     }
 
     @Test
@@ -142,9 +139,7 @@ public class BookControllerTest {
 
         BookDto actual = objectMapper.readValue(result.getResponse()
                 .getContentAsByteArray(), BookDto.class);
-        assertNotNull(actual);
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected, actual);
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test
@@ -153,10 +148,9 @@ public class BookControllerTest {
     void deleteBookById_WithValidId_NoContent() throws Exception {
         Long bookId = 1L;
 
-        MvcResult result = mockMvc.perform(delete("/books/" + bookId))
-                .andExpect(status().isNoContent())
-                .andReturn();
-        assertEquals(HttpStatus.NO_CONTENT.value(), result.getResponse().getStatus());
+        mockMvc.perform(delete("/books/" + bookId))
+                .andExpect(status().isNoContent());
+
     }
 
     @Test
@@ -178,9 +172,7 @@ public class BookControllerTest {
                 BookDto.class
         );
 
-        assertNotNull(actual);
-        assertEquals(expected.getId(), actual.getId());
-        assertEquals(expected.getCategoryIds(), actual.getCategoryIds());
+        assertThat(actual).isEqualTo(expected);
     }
 
     @Test

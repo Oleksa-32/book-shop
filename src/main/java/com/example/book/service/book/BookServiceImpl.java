@@ -1,4 +1,4 @@
-package com.example.book.service;
+package com.example.book.service.book;
 
 import com.example.book.dto.book.BookDto;
 import com.example.book.dto.book.BookDtoWithoutCategoryIds;
@@ -10,6 +10,7 @@ import com.example.book.model.Book;
 import com.example.book.repository.BookRepository;
 import com.example.book.repository.CategoryRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
+import com.example.book.service.book.BookService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
