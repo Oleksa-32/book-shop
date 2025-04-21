@@ -14,7 +14,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Named;
 
-@Mapper(componentModel = "spring", config = MapperConfig.class, uses = {CategoryMapper.class})
+@Mapper(config = MapperConfig.class, uses = {CategoryMapper.class})
 public interface BookMapper {
 
     BookDto toDto(Book book);
