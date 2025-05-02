@@ -36,7 +36,7 @@ databaseChangeLog:
                   value: "john.smith@example.com"
               - column:
                   name: password
-                  value: "&K^eL@v?g6$VrtUJes:^"
+                  value: "$2a$10$EzbrJCN8wj8M8B5aQiRmiuWqVvnxna73Ccvm38aoneiJb88kkwlH2"
               - column:
                   name: first_name
                   value: "John"

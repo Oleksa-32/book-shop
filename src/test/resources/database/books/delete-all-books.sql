@@ -1,0 +1,5 @@
+TRUNCATE TABLE books RESTART IDENTITY;
+
+DELETE FROM books_categories;
+
+DELETE FROM categories;
