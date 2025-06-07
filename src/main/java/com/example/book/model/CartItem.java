@@ -32,4 +32,6 @@ public class CartItem {
     private Book book;
     @Column(nullable = false)
     private int quantity;
+    @Column(nullable = false, columnDefinition = "tinyint(1)")
+    private boolean isDeleted = false;
 }

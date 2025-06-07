@@ -12,6 +12,7 @@ import com.example.book.model.User;
 import com.example.book.repository.BookRepository;
 import com.example.book.repository.CartItemRepository;
 import com.example.book.repository.ShoppingCartRepository;
+import com.example.book.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     private final CartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
     private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     @Override
     public ShoppingCartDto findByUserId(Long userId) {
@@ -34,6 +36,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
                 () -> new EntityNotFoundException("Cart of user with id " + userId
                         + "wasn't found"));
         return shoppingCartMapper.toDto(shoppingCart);
+    }
+
+    @Override
+    public void createShoppingCartForUser(User user) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.setUser(user);
+        shoppingCartRepository.save(shoppingCart);
     }
 
     @Override
@@ -82,12 +91,5 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void deleteById(Long id) {
         cartItemRepository.deleteById(id);
-    }
-
-    @Override
-    public void createShoppingCartForUser(User user) {
-        ShoppingCart shoppingCart = new ShoppingCart();
-        shoppingCart.setUser(user);
-        shoppingCartRepository.save(shoppingCart);
     }
 }

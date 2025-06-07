@@ -7,7 +7,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TitleSpecificationProvider implements SpecificationProvider {
+public class TitleSpecificationProvider implements SpecificationProvider<Book> {
     private static final String TITLE_KEY = "title";
 
     @Override
