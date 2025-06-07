@@ -1,15 +1,17 @@
-package com.example.book.service;
+package com.example.book.service.book;
 
 import com.example.book.dto.book.BookDto;
 import com.example.book.dto.book.BookDtoWithoutCategoryIds;
 import com.example.book.dto.book.BookSearchParametersDto;
 import com.example.book.dto.book.CreateBookRequestDto;
+import com.example.book.dto.book.UpdateBookRequestDto;
 import com.example.book.mapper.BookMapper;
 import com.example.book.model.Book;
 import com.example.book.repository.BookRepository;
 import com.example.book.repository.CategoryRepository;
 import com.example.book.repository.book.BookSpecificationBuilder;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +20,12 @@ import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final BookSpecificationBuilder specificationBuilder;
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public BookDto save(CreateBookRequestDto requestDto) {
@@ -45,7 +48,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookDto updateBook(Long id, BookDto updateRequest) {
+    public BookDto updateBook(Long id, UpdateBookRequestDto updateRequest) {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Book with id " + id + " not found"));

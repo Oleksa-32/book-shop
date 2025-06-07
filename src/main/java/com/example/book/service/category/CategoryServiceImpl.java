@@ -1,4 +1,4 @@
-package com.example.book.service;
+package com.example.book.service.category;
 
 import com.example.book.dto.category.CategoryDto;
 import com.example.book.dto.category.CreateCategoryRequestDto;
@@ -43,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() ->
                         new EntityNotFoundException("Category with id " + id + " not found"));
+        categoryMapper.updateFromDto(updateCategoryRequestDto, existingCategory);
         return categoryMapper.toDto(categoryRepository.save(existingCategory));
     }
 

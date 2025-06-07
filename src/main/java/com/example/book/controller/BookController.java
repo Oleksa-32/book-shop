@@ -3,7 +3,8 @@ package com.example.book.controller;
 import com.example.book.dto.book.BookDto;
 import com.example.book.dto.book.BookSearchParametersDto;
 import com.example.book.dto.book.CreateBookRequestDto;
-import com.example.book.service.BookService;
+import com.example.book.dto.book.UpdateBookRequestDto;
+import com.example.book.service.book.BookService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -54,7 +55,8 @@ public class BookController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Update book", description = "Updates a book's details")
-    public BookDto updateBook(@PathVariable Long id, @RequestBody BookDto updateRequest) {
+    public BookDto updateBook(@PathVariable Long id,
+                              @RequestBody @Valid UpdateBookRequestDto updateRequest) {
         return bookService.updateBook(id, updateRequest);
     }
 
