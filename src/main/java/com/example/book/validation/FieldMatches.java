@@ -16,4 +16,10 @@ public @interface FieldMatches {
     Class<? extends Payload>[] payload() default {};
     String field();
     String fieldMatch();
+
+    @Target({ElementType.TYPE, ElementType.ANNOTATION_TYPE})
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface List {
+        FieldMatches[] value();
+    }
 }

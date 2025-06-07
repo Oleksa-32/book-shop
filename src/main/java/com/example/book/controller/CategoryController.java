@@ -75,7 +75,7 @@ public class CategoryController {
         categoryService.deleteById(id);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/{id}/books")
     @Operation(summary = "Get books by category id",
             description = "Get all books which belong for category by given category id")
