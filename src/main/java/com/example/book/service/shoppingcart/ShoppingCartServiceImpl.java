@@ -14,7 +14,7 @@ import com.example.book.repository.CartItemRepository;
 import com.example.book.repository.ShoppingCartRepository;
 import com.example.book.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
