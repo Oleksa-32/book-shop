@@ -10,6 +10,11 @@ services:
       MYSQL_DATABASE: ${MYSQLDB_DATABASE}
     ports:
       - "${MYSQLDB_HOST_PORT}:${MYSQLDB_CONTAINER_PORT}"
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
   app:
     restart: on-failure
@@ -24,3 +29,6 @@ services:
       SPRING_DATASOURCE_USERNAME: ${MYSQLDB_USER}
       SPRING_DATASOURCE_PASSWORD: ${MYSQLDB_ROOT_PASSWORD}
       JAVA_TOOL_OPTIONS:          "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${DEBUG_PORT}"
+    depends_on:
+      mysql:
+        condition: service_healthy
